@@ -2,15 +2,16 @@
   "name": "Kukusave",
   "short_name": "Kukusave",
   "description": "Own Kuku Tokens. Secure your egg supply.",
-  "start_url": "/",
+  "start_url": "/kukusave/",
   "display": "standalone",
   "background_color": "#fffbeb",
   "theme_color": "#d97706",
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐔</text></svg>",
-      "sizes": "192x192",
-      "type": "image/svg+xml"
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
   ]
 }

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard | Kukusave</title>
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', system-ui, sans-serif; }</style>
+</head>
+<body class="bg-amber-50 text-slate-800">
+    <header class="bg-white sticky top-0 z-50 border-b border-amber-100">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-2 font-extrabold text-amber-600 text-xl">🐔 Kukusave</a>
+            <a href="index.html" class="text-sm text-slate-600 hover:text-amber-600">← Back to Home</a>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-10">
+        <h1 class="text-3xl font-bold mb-2">My Kuku Dashboard</h1>
+        <p class="text-slate-600 mb-8">Demo mode — data stored locally in your browser.</p>
+
+        <div class="grid md:grid-cols-3 gap-6 mb-10">
+            <div class="bg-white p-6 rounded-2xl shadow border border-amber-100">
+                <p class="text-sm text-slate-500">Tokens Owned</p>
+                <p id="tokenCount" class="text-3xl font-bold text-amber-600">0</p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow border border-amber-100">
+                <p class="text-sm text-slate-500">Weekly Egg Allocation</p>
+                <p id="eggAllocation" class="text-3xl font-bold text-amber-700">0 trays</p>
+            </div>
+            <div class="bg-white p-6 rounded-2xl shadow border border-amber-100">
+                <p class="text-sm text-slate-500">Estimated Annual Value</p>
+                <p id="annualValue" class="text-3xl font-bold text-emerald-600">KES 0</p>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 md:p-8 rounded-2xl shadow border border-amber-100 mb-8">
+            <h2 class="text-xl font-bold mb-4">Buy More Tokens</h2>
+            <div class="flex flex-col sm:flex-row gap-4 items-end">
+                <div class="flex-1">
+                    <label class="block text-sm font-medium mb-1">Number of tokens</label>
+                    <input type="number" id="buyAmount" min="1" max="50" value="5" class="w-full p-3 border rounded-xl">
+                </div>
+                <button onclick="buyTokens()" class="bg-emerald-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-emerald-700">Simulate M-Pesa Purchase</button>
+            </div>
+            <p id="buyStatus" class="mt-3 text-sm"></p>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow border border-amber-100">
+            <h2 class="text-xl font-bold mb-4">Recent Activity</h2>
+            <ul id="activity" class="space-y-2 text-sm text-slate-600">
+                <li>No activity yet. Buy your first tokens above.</li>
+            </ul>
+        </div>
+    </main>
+
+    <script>
+        const STORAGE_KEY = 'kukusave_tokens';
+        const ACTIVITY_KEY = 'kukusave_activity';
+
+        function loadData() {
+            const tokens = parseInt(localStorage.getItem(STORAGE_KEY) || '0');
+            const activity = JSON.parse(localStorage.getItem(ACTIVITY_KEY) || '[]');
+            updateUI(tokens, activity);
+        }
+
+        function updateUI(tokens, activity) {
+            document.getElementById('tokenCount').textContent = tokens;
+            const trays = Math.round(tokens * 0.4 * 10) / 10;
+            document.getElementById('eggAllocation').textContent = trays + ' trays';
+            const value = Math.round(tokens * 1500 * 1.52);
+            document.getElementById('annualValue').textContent = 'KES ' + value.toLocaleString();
+
+            const list = document.getElementById('activity');
+            if (activity.length === 0) {
+                list.innerHTML = '<li>No activity yet.</li>';
+            } else {
+                list.innerHTML = activity.slice(0, 8).map(a => `<li>${a}</li>`).join('');
+            }
+        }
+
+        function buyTokens() {
+            const amount = parseInt(document.getElementById('buyAmount').value) || 1;
+            const current = parseInt(localStorage.getItem(STORAGE_KEY) || '0');
+            const newTotal = current + amount;
+            localStorage.setItem(STORAGE_KEY, newTotal);
+
+            const activity = JSON.parse(localStorage.getItem(ACTIVITY_KEY) || '[]');
+            activity.unshift(`Bought ${amount} token(s) — ${new Date().toLocaleDateString()}`);
+            localStorage.setItem(ACTIVITY_KEY, JSON.stringify(activity));
+
+            document.getElementById('buyStatus').innerHTML = `<span class="text-emerald-600 font-medium">✓ Simulated purchase of ${amount} tokens complete. Check your phone for STK (demo).</span>`;
+            loadData();
+        }
+
+        loadData();
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+    </script>
+</body>
+</html>
